@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proces priorytetyzacji backlogu — cyfrowe.pl</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f5f6f8;
+    color: #1a1a2e;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .hero {
+    text-align: center;
+    padding: 60px 40px 40px;
+    background: linear-gradient(180deg, #ffffff 0%, #f5f6f8 100%);
+    border-bottom: 1px solid #e2e4ea;
+  }
+  .hero h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #2563eb, #7c3aed, #db2777);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .hero p {
+    font-size: 1.1rem;
+    color: #6b7280;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+  /* MAIN FORMULA */
+  .formula-section {
+    text-align: center;
+    padding: 50px 0 30px;
+  }
+  .formula-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: #ffffff;
+    border: 1px solid #e2e4ea;
+    border-radius: 20px;
+    padding: 28px 44px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .formula-box .value { color: #2563eb; }
+  .formula-box .cost { color: #db2777; }
+  .formula-box .confidence { color: #7c3aed; }
+  .formula-box .op { color: #9ca3af; font-size: 1.8rem; }
+  .formula-box .result { color: #059669; }
+  .formula-sub {
+    color: #9ca3af;
+    font-size: 0.85rem;
+    margin-top: 14px;
+  }
+
+  /* EXCEPTIONS */
+  .exceptions-section {
+    padding: 40px 0 20px;
+  }
+  .exceptions-section h2 {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #374151;
+  }
+  .exceptions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+  .exception-card {
+    padding: 24px;
+    border-radius: 16px;
+    text-align: center;
+    background: #ffffff;
+  }
+  .exception-card.compliance {
+    border: 1px solid rgba(220,38,38,0.2);
+  }
+  .exception-card.techdebt {
+    border: 1px solid rgba(217,119,6,0.2);
+  }
+  .exception-card.override {
+    border: 1px solid rgba(124,58,237,0.2);
+  }
+  .exception-card .icon { font-size: 2rem; margin-bottom: 12px; }
+  .exception-card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+  .exception-card.compliance h3 { color: #dc2626; }
+  .exception-card.techdebt h3 { color: #d97706; }
+  .exception-card.override h3 { color: #7c3aed; }
+  .exception-card p { font-size: 0.82rem; color: #6b7280; line-height: 1.5; }
+
+  /* INTERACTIVE CALCULATOR */
+  .calc-section { padding: 50px 0 70px; }
+  .calc-section h2 { text-align: center; font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: #374151; }
+  .calc-section .subtitle { text-align: center; font-size: 0.9rem; color: #6b7280; margin-bottom: 36px; }
+
+  .calc-dim {
+    background: #ffffff; border: 1px solid #e2e4ea; border-radius: 16px;
+    margin-bottom: 16px; overflow: hidden;
+  }
+  .calc-dim-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 22px;
+  }
+  .calc-dim-left { display: flex; align-items: center; gap: 12px; }
+  .calc-dim-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .calc-dim-header h3 { font-size: 0.95rem; font-weight: 700; }
+  .calc-dim-header .dim-hint { font-size: 0.72rem; color: #9ca3af; margin-top: 1px; }
+  .calc-dim-badge { min-width: 52px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 800; flex-shrink: 0; }
+  .calc-dim-body { padding: 0 22px 20px; }
+
+  .calc-dim.val .calc-dim-icon { background: rgba(37,99,235,0.1); }
+  .calc-dim.val .calc-dim-header h3 { color: #2563eb; }
+  .calc-dim.val .calc-dim-badge { background: rgba(37,99,235,0.08); color: #2563eb; }
+  .calc-dim.reach .calc-dim-icon { background: rgba(5,150,105,0.1); }
+  .calc-dim.reach .calc-dim-header h3 { color: #059669; }
+  .calc-dim.reach .calc-dim-badge { background: rgba(5,150,105,0.08); color: #059669; }
+  .calc-dim.conf .calc-dim-icon { background: rgba(124,58,237,0.1); }
+  .calc-dim.conf .calc-dim-header h3 { color: #7c3aed; }
+  .calc-dim.conf .calc-dim-badge { background: rgba(124,58,237,0.08); color: #7c3aed; }
+  .calc-dim.cost .calc-dim-icon { background: rgba(219,39,119,0.1); }
+  .calc-dim.cost .calc-dim-header h3 { color: #db2777; }
+  .calc-dim.cost .calc-dim-badge { background: rgba(219,39,119,0.08); color: #db2777; }
+
+  .sub-q { margin-bottom: 14px; }
+  .sub-q:last-child { margin-bottom: 0; }
+  .sub-q-label { font-size: 0.8rem; font-weight: 600; color: #6b7280; margin-bottom: 8px; display: block; }
+  .sub-q-options { display: flex; gap: 6px; flex-wrap: wrap; }
+  .sq-btn {
+    padding: 8px 13px; border: 1.5px solid #e2e4ea; background: #ffffff;
+    color: #6b7280; border-radius: 10px; font-size: 0.74rem; font-family: 'Inter', sans-serif;
+    font-weight: 500; cursor: pointer; transition: all 0.2s; line-height: 1.35; text-align: left;
+  }
+  .sq-btn:hover { border-color: #9ca3af; color: #374151; }
+  .calc-dim.val .sq-btn.active { border-color: #2563eb; background: rgba(37,99,235,0.06); color: #2563eb; }
+  .calc-dim.reach .sq-btn.active { border-color: #059669; background: rgba(5,150,105,0.06); color: #059669; }
+  .calc-dim.conf .sq-btn.active { border-color: #7c3aed; background: rgba(124,58,237,0.06); color: #7c3aed; }
+  .calc-dim.cost .sq-btn.active { border-color: #db2777; background: rgba(219,39,119,0.06); color: #db2777; }
+
+  .calc-divider { text-align: center; padding: 12px 0; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; color: #9ca3af; }
+  .calc-divider span { display: inline-block; padding: 5px 18px; background: #ffffff; border: 1px solid #e2e4ea; border-radius: 20px; }
+
+  .calc-result-box { text-align: center; padding: 30px; background: #ffffff; border: 1px solid #e2e4ea; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+  .calc-result-formula { font-size: 0.95rem; color: #9ca3af; margin-bottom: 10px; font-family: monospace; }
+  .calc-result-score { font-size: 3rem; font-weight: 800; color: #059669; margin-bottom: 6px; transition: color 0.3s; }
+  .calc-result-label { font-size: 0.85rem; color: #6b7280; }
+  .calc-result-bar { margin-top: 20px; height: 12px; background: #f0f1f3; border-radius: 6px; overflow: hidden; position: relative; }
+  .calc-result-fill { height: 100%; border-radius: 6px; transition: all 0.5s ease; background: linear-gradient(90deg, #db2777, #ea580c, #d97706, #059669, #2563eb); }
+  .calc-bar-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.7rem; color: #9ca3af; }
+  .calc-breakdown { display: flex; justify-content: center; gap: 28px; margin-top: 20px; padding-top: 18px; border-top: 1px solid #e2e4ea; }
+  .calc-bd-item { text-align: center; }
+  .calc-bd-item .bd-label { font-size: 0.7rem; color: #6b7280; margin-bottom: 3px; }
+  .calc-bd-item .bd-val { font-size: 1.15rem; font-weight: 700; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .flow-grid { grid-template-columns: 1fr; gap: 20px; }
+    .flow-divider { display: none; }
+    .example-grid { grid-template-columns: 1fr; }
+    .exceptions-grid { grid-template-columns: 1fr; }
+    .formula-box { font-size: 1.1rem; padding: 20px 28px; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .rhythm-timeline { flex-direction: column; align-items: center; }
+    .rhythm-step::after { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="hero">
+  <h1>Priorytetyzacja backlogu</h1>
+  <p>Proces decyzyjny oparty na liczbach, nie na opiniach. Cztery proste pytania dają jedną liczbę, która decyduje o kolejności realizacji.</p>
+</div>
+
+<div class="container">
+
+  <!-- FORMULA -->
+  <div class="formula-section">
+    <div class="formula-box">
+      <span class="result">Score</span>
+      <span class="op">=</span>
+      <span class="op">(</span>
+      <span class="value">Wpływ + Zasięg</span>
+      <span class="op">×</span>
+      <span class="confidence">Pewność</span>
+      <span class="op">)</span>
+      <span class="op">÷</span>
+      <span class="cost">Rozmiar</span>
+    </div>
+    <div class="formula-sub">Im wyższy score, tym wcześniej realizujemy. Proste.</div>
+  </div>
+
+  <!-- EXCEPTIONS -->
+  <div class="exceptions-section">
+    <h2>Trzy wyjątki od formuły</h2>
+    <div class="exceptions-grid">
+      <div class="exception-card compliance">
+        <div class="icon">⚖️</div>
+        <h3>Prawo i compliance</h3>
+        <p>GPSR, Omnibus, RODO, dostępność — zawsze na górze backlogu, nie wchodzą do scoringu. Kary za brak zgodności są zbyt duże.</p>
+      </div>
+      <div class="exception-card techdebt">
+        <div class="icon">🔧</div>
+        <h3>Dług techniczny</h3>
+        <p>15–20% czasu zespołu zarezerwowane na dług. Nie rywalizuje z ficzerami — ma własną pulę i własny ranking wewnętrzny.</p>
+      </div>
+      <div class="exception-card override">
+        <div class="icon">👤</div>
+        <h3>Override ekspercki</h3>
+        <p>PM może raz na sprint przesunąć jedno zadanie o max 3 pozycje. Warunek: napisane uzasadnienie w komentarzu.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE CALCULATOR -->
+  <div class="calc-section">
+    <h2>Kalkulator Score</h2>
+    <p class="subtitle">Odpowiedz na pytania — system sam wyliczy ocenę</p>
+
+    <!-- IMPACT -->
+    <div class="calc-dim val" id="dim-impact">
+      <div class="calc-dim-header">
+        <div class="calc-dim-left">
+          <div class="calc-dim-icon">💰</div>
+          <div><h3>Wpływ na biznes</h3><div class="dim-hint">Jaki efekt finansowy lub strategiczny?</div></div>
+        </div>
+        <div class="calc-dim-badge" id="badge-impact">2</div>
+      </div>
+      <div class="calc-dim-body">
+        <div class="sub-q"><span class="sub-q-label">Jak oceniasz łączny wpływ tej zmiany na biznes?</span>
+          <div class="sub-q-options" data-dim="impact" data-q="level">
+            <button class="sq-btn" data-pts="1">Drobna poprawa<br><small>oszczędność minut, dziesiątki PLN, sporadycznie</small></button>
+            <button class="sq-btn active" data-pts="2">Odczuwalna poprawa<br><small>setki PLN/msc, regularne wystąpienia, jeden cel biznesowy</small></button>
+            <button class="sq-btn" data-pts="4">Duży wpływ<br><small>tysiące PLN/msc, codziennie, widoczne w wynikach miesiąca</small></button>
+            <button class="sq-btn" data-pts="8">Krytyczny lub strategiczny<br><small>nowy kanał/rynek, kilka celów naraz, duża skala</small></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REACH -->
+    <div class="calc-dim reach" id="dim-reach">
+      <div class="calc-dim-header">
+        <div class="calc-dim-left">
+          <div class="calc-dim-icon">👥</div>
+          <div><h3>Zasięg klientów</h3><div class="dim-hint">Ilu i jakich klientów to dotknie?</div></div>
+        </div>
+        <div class="calc-dim-badge" id="badge-reach">4</div>
+      </div>
+      <div class="calc-dim-body">
+        <div class="sub-q"><span class="sub-q-label">Ilu i jak wartościowych klientów to dotknie?</span>
+          <div class="sub-q-options" data-dim="reach" data-q="level">
+            <button class="sq-btn" data-pts="1">Marginalny<br><small>edge case, pojedyncze przypadki, po zakupie</small></button>
+            <button class="sq-btn" data-pts="2">Wąski segment<br><small>np. tylko UŻY, tylko B2B, klienci jednorazowi</small></button>
+            <button class="sq-btn active" data-pts="4">Istotny segment<br><small>np. mobilni, konkretny typ dostawy, powracający klienci</small></button>
+            <button class="sq-btn" data-pts="6">Większość klientów<br><small>szeroki zasięg, checkout lub przeglądanie oferty</small></button>
+            <button class="sq-btn" data-pts="8">Każdy klient<br><small>wszyscy, w kluczowym momencie ścieżki</small></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIDENCE -->
+    <div class="calc-dim conf" id="dim-confidence">
+      <div class="calc-dim-header">
+        <div class="calc-dim-left">
+          <div class="calc-dim-icon">🔍</div>
+          <div><h3>Pewność oceny</h3><div class="dim-hint">Filtr anty-HiPPO — skąd wiemy, że to ważne?</div></div>
+        </div>
+        <div class="calc-dim-badge" id="badge-confidence">×0.6</div>
+      </div>
+      <div class="calc-dim-body">
+        <div class="sub-q"><span class="sub-q-label">Na czym opieramy przekonanie, że to jest ważne?</span>
+          <div class="sub-q-options" data-dim="confidence" data-q="level">
+            <button class="sq-btn" data-pts="0">Przeczucie<br><small>ktoś uważa że to ważne, brak danych</small></button>
+            <button class="sq-btn active" data-pts="1">Poszlaki<br><small>dane z jednego źródła (GA4 albo zgłoszenia SD albo Verto)</small></button>
+            <button class="sq-btn" data-pts="2">Dowody<br><small>twarde dane z kilku źródeł lub sprawdzone w praktyce</small></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-divider"><span>÷ podzielone przez koszt</span></div>
+
+    <!-- EFFORT -->
+    <div class="calc-dim cost" id="dim-effort">
+      <div class="calc-dim-header">
+        <div class="calc-dim-left">
+          <div class="calc-dim-icon">⏱️</div>
+          <div><h3>Rozmiar zadania</h3><div class="dim-hint">Ile pracy to wymaga? (wycena programistów)</div></div>
+        </div>
+        <div class="calc-dim-badge" id="badge-effort">S = 1</div>
+      </div>
+      <div class="calc-dim-body">
+        <div class="sub-q"><span class="sub-q-label">Rozmiar oceniony przez programistów</span>
+          <div class="sub-q-options" data-dim="effort" data-q="size" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr 1fr; gap:6px;">
+            <button class="sq-btn active" data-pts="1" style="text-align:center;"><strong>S</strong><br><small>do 2 dni</small></button>
+            <button class="sq-btn" data-pts="2" style="text-align:center;"><strong>M</strong><br><small>do tygodnia</small></button>
+            <button class="sq-btn" data-pts="4" style="text-align:center;"><strong>L</strong><br><small>2–3 tygodnie</small></button>
+            <button class="sq-btn" data-pts="8" style="text-align:center;"><strong>XL</strong><br><small>miesiąc</small></button>
+            <button class="sq-btn" data-pts="13" style="text-align:center;"><strong>XXL</strong><br><small>ponad miesiąc</small></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="calc-result-box" style="margin-top: 24px;">
+      <div class="calc-result-formula" id="calc-formula">(2 + 4.0) × 0.6 ÷ 1</div>
+      <div class="calc-result-score" id="calc-score">3.60</div>
+      <div class="calc-result-label">Score — im wyżej, tym wcześniej robimy</div>
+      <div class="calc-result-bar">
+        <div class="calc-result-fill" id="calc-bar" style="width: 45%"></div>
+      </div>
+      <div class="calc-bar-labels">
+        <span>0 — niski priorytet</span>
+        <span>8+ — najwyższy priorytet</span>
+      </div>
+      <div class="calc-breakdown">
+        <div class="calc-bd-item"><div class="bd-label">Wpływ + Zasięg</div><div class="bd-val" style="color:#2563eb;" id="bd-value">6.0</div></div>
+        <div class="calc-bd-item"><div class="bd-label">Pewność</div><div class="bd-val" style="color:#7c3aed;" id="bd-confidence">×0.6</div></div>
+        <div class="calc-bd-item"><div class="bd-label">Rozmiar</div><div class="bd-val" style="color:#db2777;" id="bd-cost">1</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const answers = {
+    impact: { level: 2 },
+    reach: { level: 4 },
+    confidence: { level: 1 },
+    effort: { size: 1 }
+  };
+
+  function mapConfidence(raw) { return raw <= 0 ? 0.3 : raw <= 1 ? 0.6 : 1.0; }
+  function effortLabel(v) { return v <= 1 ? 'S' : v <= 2 ? 'M' : v <= 4 ? 'L' : v <= 8 ? 'XL' : 'XXL'; }
+
+  function recalc() {
+    const impact = Math.max(answers.impact.level, 1);
+    const reach = Math.max(answers.reach.level, 1);
+    const confidence = mapConfidence(answers.confidence.level);
+    const effort = Math.max(answers.effort.size, 1);
+
+    const value = impact + reach;
+    const cost = effort;
+    const score = cost > 0 ? (value * confidence) / cost : 0;
+
+    document.getElementById('badge-impact').textContent = impact;
+    document.getElementById('badge-reach').textContent = reach;
+    document.getElementById('badge-confidence').textContent = '×' + confidence.toFixed(1);
+    document.getElementById('badge-effort').textContent = effortLabel(effort) + ' = ' + effort;
+
+    document.getElementById('calc-formula').textContent =
+      '(' + impact + ' + ' + reach + ') × ' + confidence + ' ÷ ' + effort;
+    document.getElementById('calc-score').textContent = score.toFixed(2);
+    document.getElementById('calc-bar').style.width = Math.min((score / 8) * 100, 100) + '%';
+
+    const el = document.getElementById('calc-score');
+    el.style.color = score >= 3 ? '#2563eb' : score >= 1.5 ? '#059669' : score >= 0.8 ? '#d97706' : '#ea580c';
+
+    document.getElementById('bd-value').textContent = value.toFixed(1);
+    document.getElementById('bd-confidence').textContent = '×' + confidence.toFixed(1);
+    document.getElementById('bd-cost').textContent = cost;
+  }
+
+  document.querySelectorAll('.sub-q-options').forEach(group => {
+    const dim = group.dataset.dim, q = group.dataset.q;
+    group.querySelectorAll('.sq-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.sq-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        answers[dim][q] = parseInt(btn.dataset.pts);
+        recalc();
+      });
+    });
+  });
+
+  recalc();
+</script>
+</body>
+  </html>
