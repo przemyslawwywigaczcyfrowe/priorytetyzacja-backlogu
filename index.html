@@ -212,6 +212,77 @@ table.exceptions td.body { color: var(--ink-2); }
   padding-top: 16px;
 }
 
+.capacity-bar {
+  display: flex;
+  width: 100%;
+  height: 88px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 24px 0 32px;
+  border: 1px solid var(--line);
+}
+.cap-segment {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 10px;
+  text-align: center;
+  min-width: 0;
+}
+.cap-segment.dark { background: var(--ink); color: #f8fafc; }
+.cap-segment.dark-2 { background: var(--ink-2); color: #f8fafc; }
+.cap-segment.dark-3 { background: var(--ink-3); color: #f8fafc; }
+.cap-segment.light-1 { background: #94a3b8; color: var(--ink); }
+.cap-segment.light-2 { background: var(--line-strong); color: var(--ink); }
+.cap-label {
+  font-size: 11px;
+  font-weight: 500;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.01em;
+}
+.cap-pct {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 6px;
+  letter-spacing: -0.01em;
+}
+
+table.capacity {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0 0 24px;
+  font-size: 15px;
+}
+table.capacity th, table.capacity td {
+  text-align: left;
+  vertical-align: top;
+  padding: 14px 20px;
+  border-top: 1px solid var(--line);
+}
+table.capacity thead th {
+  border-top: none;
+  border-bottom: 1px solid var(--line-strong);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding-bottom: 12px;
+  padding-top: 0;
+}
+table.capacity td.label { font-weight: 600; color: var(--ink); width: 30%; }
+table.capacity td.pct {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  width: 12%;
+  color: var(--ink);
+}
+table.capacity td.body { color: var(--ink-2); }
+
 footer.site {
   margin-top: 96px;
   padding: 32px 0;
@@ -229,6 +300,10 @@ footer.site {
   .result-score { font-size: 44px; }
   .result-grid { grid-template-columns: 1fr; gap: 16px; }
   table.exceptions td.label { white-space: normal; }
+  .capacity-bar { height: auto; flex-direction: column; }
+  .cap-segment { width: 100% !important; padding: 14px 16px; flex-direction: row; justify-content: space-between; }
+  .cap-pct { margin-top: 0; }
+  table.capacity td.label { white-space: normal; }
 }
 </style>
 </head>
@@ -253,8 +328,8 @@ footer.site {
     <p class="formula-note">Cztery wartości, jedna liczba. Bez interpretacji, bez negocjacji.</p>
   </section>
 
-  <h2>Trzy wyjątki od formuły</h2>
-  <p>Nie wszystko musi przejść przez kalkulator. Trzy klasy zadań mają własne reguły, żeby uniknąć absurdów.</p>
+  <h2>Dwa wyjątki od formuły</h2>
+  <p>Nie wszystko musi przejść przez kalkulator. Dwie klasy zadań mają własne reguły, żeby uniknąć absurdów.</p>
 
   <table class="exceptions">
     <thead>
@@ -269,11 +344,6 @@ footer.site {
         <td class="label">Prawo i compliance</td>
         <td class="scope">Zawsze na górze backlogu</td>
         <td class="body">GPSR, Omnibus, RODO, dostępność. Nie wchodzą do scoringu, bo kary za brak zgodności są nieproporcjonalnie duże w stosunku do kosztu wdrożenia.</td>
-      </tr>
-      <tr>
-        <td class="label">Dług techniczny</td>
-        <td class="scope">15–20% czasu zespołu</td>
-        <td class="body">Dług ma własną pulę i własny ranking wewnętrzny. Nie rywalizuje o miejsce z ficzerami, bo zawsze przegra. A bez niego stoimy.</td>
       </tr>
       <tr>
         <td class="label">Override ekspercki</td>
@@ -333,11 +403,11 @@ footer.site {
         <small>Ile pracy to wymaga (wycena programistów)?</small>
       </div>
       <div class="options" data-group="size">
-        <label data-value="1"><span class="opt-num">S</span><span><span class="opt-name">Do 2 dni.</span></span></label>
-        <label data-value="2"><span class="opt-num">M</span><span><span class="opt-name">Do tygodnia.</span></span></label>
-        <label data-value="3"><span class="opt-num">L</span><span><span class="opt-name">2–3 tygodnie.</span></span></label>
-        <label data-value="5"><span class="opt-num">XL</span><span><span class="opt-name">Około miesiąca.</span></span></label>
-        <label data-value="8"><span class="opt-num">XXL</span><span><span class="opt-name">Ponad miesiąc.</span></span></label>
+        <label data-value="1"><span class="opt-num">1</span><span><span class="opt-name">do 2 dni</span></span></label>
+        <label data-value="2"><span class="opt-num">2</span><span><span class="opt-name">do tygodnia</span></span></label>
+        <label data-value="4"><span class="opt-num">4</span><span><span class="opt-name">2-3 tygodnie</span></span></label>
+        <label data-value="8"><span class="opt-num">8</span><span><span class="opt-name">około miesiąca</span></span></label>
+        <label data-value="16"><span class="opt-num">16</span><span><span class="opt-name">ponad miesiąc</span></span></label>
       </div>
     </div>
 
@@ -355,6 +425,75 @@ footer.site {
       </div>
     </div>
   </div>
+
+  <h2>Pojemność sprintu</h2>
+  <p>
+    Score wyznacza kolejność. Pojemność wyznacza, ile się zmieści. Pojemność jest zmienna - urlopy, święta, choroby, dni wolne sprawiają, że jeden sprint ma 100 osobogodzin, a inny 70. Co zostaje stałe, to <strong>proporcje</strong>: niezależnie od tego, ile akurat mamy godzin, dzielimy je na pięć kategorii w stałych udziałach.
+  </p>
+
+  <div class="capacity-bar" aria-label="Podział pojemności sprintu na cele">
+    <div class="cap-segment dark" style="width: 40%;">
+      <span class="cap-label">Więcej pieniędzy</span>
+      <span class="cap-pct">40%</span>
+    </div>
+    <div class="cap-segment dark-2" style="width: 20%;">
+      <span class="cap-label">Udział w rynku i CX</span>
+      <span class="cap-pct">20%</span>
+    </div>
+    <div class="cap-segment dark-3" style="width: 20%;">
+      <span class="cap-label">Dług technologiczny</span>
+      <span class="cap-pct">20%</span>
+    </div>
+    <div class="cap-segment light-1" style="width: 10%;">
+      <span class="cap-label">Niższe koszty</span>
+      <span class="cap-pct">10%</span>
+    </div>
+    <div class="cap-segment light-2" style="width: 10%;">
+      <span class="cap-label">Praca wewnętrzna IT</span>
+      <span class="cap-pct">10%</span>
+    </div>
+  </div>
+
+  <table class="capacity">
+    <thead>
+      <tr>
+        <th>Cel</th>
+        <th>Udział</th>
+        <th>Co tu trafia</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="label">Więcej pieniędzy</td>
+        <td class="pct">40%</td>
+        <td class="body">Zadania, które bezpośrednio podnoszą obrót lub marżę: konwersja, średnia wartość koszyka, retencja, monetyzacja.</td>
+      </tr>
+      <tr>
+        <td class="label">Udział w rynku i CX</td>
+        <td class="pct">20%</td>
+        <td class="body">Pozyskiwanie nowych klientów, doświadczenie zakupowe, lojalność, NPS, nowe segmenty.</td>
+      </tr>
+      <tr>
+        <td class="label">Dług technologiczny</td>
+        <td class="pct">20%</td>
+        <td class="body">Refaktor, upgrade frameworków, usuwanie blockerów dla dewelopmentu. W tej puli rządzi własny ranking, niezależny od scoringu produktowego.</td>
+      </tr>
+      <tr>
+        <td class="label">Niższe koszty</td>
+        <td class="pct">10%</td>
+        <td class="body">Optymalizacje operacyjne: redukcja zwrotów, automatyzacje, mniej godzin ręcznej pracy w BOK i salonach, niższe koszty obsługi zamówienia.</td>
+      </tr>
+      <tr>
+        <td class="label">Praca wewnętrzna IT</td>
+        <td class="pct">10%</td>
+        <td class="body">Rozwój zespołu, narzędzia developerskie, CI/CD, eksperymenty wewnętrzne, automatyzacje pracy programistów.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>
+    Każde zadanie ma w Asanie pole <code>🎯 Cel</code>, które jednoznacznie wskazuje, do której kategorii należy. Zadanie bez tego pola nie wchodzi do sprintu - wraca na backlog do uzupełnienia. Score decyduje o kolejności <em>wewnątrz</em> kategorii: w grupie „Więcej pieniędzy" wybieramy najpierw zadania o najwyższym score, potem niższe, aż wypełnimy 40% pojemności sprintu. Tak samo w pozostałych kategoriach.
+  </p>
 
   <h2>Jak czytać wynik</h2>
   <p>
