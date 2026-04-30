@@ -283,6 +283,57 @@ table.capacity td.pct {
 }
 table.capacity td.body { color: var(--ink-2); }
 
+table.sprint {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 24px 0;
+  font-size: 14.5px;
+}
+table.sprint th, table.sprint td {
+  text-align: left;
+  vertical-align: top;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+}
+table.sprint thead th {
+  border-top: none;
+  border-bottom: 1px solid var(--line-strong);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding-bottom: 12px;
+  padding-top: 0;
+}
+table.sprint tr.cat td {
+  background: var(--canvas);
+  font-weight: 600;
+  color: var(--ink);
+  padding: 14px 14px 12px;
+  font-size: 14px;
+  letter-spacing: -0.005em;
+}
+table.sprint tr.cat td .cat-meta {
+  font-weight: 400;
+  color: var(--ink-3);
+  font-size: 13px;
+  margin-left: 8px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0;
+}
+table.sprint td.task { color: var(--ink-2); }
+table.sprint td.size, table.sprint td.score {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: var(--ink);
+  white-space: nowrap;
+  width: 14%;
+}
+table.sprint td.score { font-weight: 600; }
+table.sprint td.note { color: var(--ink-3); font-size: 13px; font-style: italic; }
+table.sprint .skipped td { color: var(--ink-3); }
+table.sprint .skipped td.task { text-decoration: line-through; text-decoration-color: var(--line-strong); }
+
 footer.site {
   margin-top: 96px;
   padding: 32px 0;
@@ -364,10 +415,10 @@ footer.site {
         <small>Jaki efekt finansowy lub strategiczny przyniesie ta zmiana?</small>
       </div>
       <div class="options" data-group="impact">
-        <label data-value="0"><span class="opt-num">0</span><span><span class="opt-name">Drobna poprawa.</span> <span class="opt-help">Oszczędność minut, dziesiątki PLN, sporadycznie.</span></span></label>
-        <label data-value="1"><span class="opt-num">1</span><span><span class="opt-name">Odczuwalna poprawa.</span> <span class="opt-help">Setki PLN miesięcznie, regularne wystąpienia, jeden cel biznesowy.</span></span></label>
-        <label data-value="2"><span class="opt-num">2</span><span><span class="opt-name">Duży wpływ.</span> <span class="opt-help">Tysiące PLN miesięcznie, codziennie, widoczne w wynikach miesiąca.</span></span></label>
-        <label data-value="3"><span class="opt-num">3</span><span><span class="opt-name">Krytyczny lub strategiczny.</span> <span class="opt-help">Nowy kanał, nowy rynek, kilka celów naraz, duża skala.</span></span></label>
+        <label data-value="1"><span class="opt-num">1</span><span><span class="opt-name">Drobna poprawa.</span> <span class="opt-help">Oszczędność minut, dziesiątki PLN, sporadycznie.</span></span></label>
+        <label data-value="2"><span class="opt-num">2</span><span><span class="opt-name">Odczuwalna poprawa.</span> <span class="opt-help">Setki PLN miesięcznie, regularne wystąpienia, jeden cel biznesowy.</span></span></label>
+        <label data-value="4"><span class="opt-num">4</span><span><span class="opt-name">Duży wpływ.</span> <span class="opt-help">Tysiące PLN miesięcznie, codziennie, widoczne w wynikach miesiąca.</span></span></label>
+        <label data-value="8"><span class="opt-num">8</span><span><span class="opt-name">Krytyczny lub strategiczny.</span> <span class="opt-help">Nowy kanał, nowy rynek, kilka celów naraz, duża skala.</span></span></label>
       </div>
     </div>
 
@@ -377,11 +428,10 @@ footer.site {
         <small>Ilu klientów i jak wartościowych ta zmiana dotknie?</small>
       </div>
       <div class="options" data-group="reach">
-        <label data-value="0"><span class="opt-num">0</span><span><span class="opt-name">Marginalny.</span> <span class="opt-help">Edge case, pojedyncze przypadki, po zakupie.</span></span></label>
-        <label data-value="1"><span class="opt-num">1</span><span><span class="opt-name">Wąski segment.</span> <span class="opt-help">Tylko UŻY, tylko B2B, tylko klienci jednorazowi.</span></span></label>
+        <label data-value="1"><span class="opt-num">1</span><span><span class="opt-name">Wąski segment.</span> <span class="opt-help">Edge case, pojedyncze przypadki, tylko UŻY, tylko B2B.</span></span></label>
         <label data-value="2"><span class="opt-num">2</span><span><span class="opt-name">Istotny segment.</span> <span class="opt-help">Mobilni, konkretny typ dostawy, klienci powracający.</span></span></label>
-        <label data-value="3"><span class="opt-num">3</span><span><span class="opt-name">Większość klientów.</span> <span class="opt-help">Szeroki zasięg, checkout albo przeglądanie oferty.</span></span></label>
-        <label data-value="4"><span class="opt-num">4</span><span><span class="opt-name">Każdy klient.</span> <span class="opt-help">Wszyscy, w kluczowym momencie ścieżki.</span></span></label>
+        <label data-value="4"><span class="opt-num">4</span><span><span class="opt-name">Większość klientów.</span> <span class="opt-help">Szeroki zasięg, checkout albo przeglądanie oferty.</span></span></label>
+        <label data-value="8"><span class="opt-num">8</span><span><span class="opt-name">Każdy klient.</span> <span class="opt-help">Wszyscy, w kluczowym momencie ścieżki.</span></span></label>
       </div>
     </div>
 
