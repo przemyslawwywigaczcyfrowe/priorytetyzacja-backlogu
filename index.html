@@ -212,57 +212,85 @@ table.exceptions td.body { color: var(--ink-2); }
   padding-top: 16px;
 }
 
-.capacity-list {
+.cap-bar {
+  display: flex;
+  width: 100%;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+.cap-seg {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin: 24px 0 32px;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 10px;
+  text-align: center;
+  color: #ffffff;
+  min-width: 0;
 }
-.cap-row {
-  position: relative;
-  padding: 18px 22px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
+.cap-seg-name {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
   overflow: hidden;
-  background: var(--paper);
+  text-overflow: ellipsis;
+  width: 100%;
+  letter-spacing: 0.01em;
 }
-.cap-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  background: var(--canvas);
-  border-right: 1px solid var(--line);
-  z-index: 0;
-}
-.cap-content {
-  position: relative;
-  z-index: 1;
-}
-.cap-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 16px;
-  margin-bottom: 4px;
-}
-.cap-name {
-  font-weight: 600;
-  font-size: 16px;
-  color: var(--ink);
-  letter-spacing: -0.005em;
-}
-.cap-num {
+.cap-seg-pct {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-weight: 600;
-  font-size: 18px;
-  color: var(--ink);
-  letter-spacing: -0.01em;
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 2px;
+  letter-spacing: -0.02em;
 }
-.cap-desc {
-  color: var(--ink-2);
+.cap-biznes { background: #0f172a; }
+.cap-it { background: #64748b; }
+.cap-money { background: #065f46; }
+.cap-customers { background: #1e3a8a; }
+.cap-efficiency { background: #92400e; }
+.cap-bugs { background: #9f1239; }
+.cap-bar-caption {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin: 28px 0 6px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.cap-legend {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin: 28px 0 20px;
   font-size: 14.5px;
+  color: var(--ink-2);
+}
+.cap-legend-item {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 12px;
+  align-items: baseline;
   line-height: 1.55;
+}
+.cap-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  position: relative;
+  top: 1px;
+}
+.cap-legend-item strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.cap-cel-note {
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--ink-3);
 }
 
 table.sprint {
@@ -333,9 +361,10 @@ footer.site {
   .result-score { font-size: 44px; }
   .result-grid { grid-template-columns: 1fr; gap: 16px; }
   table.exceptions td.label { white-space: normal; }
-  .cap-row { padding: 14px 16px; }
-  .cap-name { font-size: 15px; }
-  .cap-num { font-size: 16px; }
+  .cap-bar { height: 90px; }
+  .cap-seg { padding: 6px 4px; }
+  .cap-seg-name { font-size: 10px; }
+  .cap-seg-pct { font-size: 16px; }
 }
 </style>
 </head>
@@ -459,68 +488,66 @@ footer.site {
 
   <h2>Pojemność sprintu</h2>
   <p>
-    Score wyznacza kolejność. Pojemność wyznacza, ile się zmieści. Pojemność jest zmienna - urlopy, święta, choroby, dni wolne sprawiają, że jeden sprint ma 100 osobogodzin, a inny 70. Co zostaje stałe, to <strong>proporcje</strong>: niezależnie od tego, ile akurat mamy godzin, dzielimy je na pięć kategorii w stałych udziałach.
+    Sprint dzielimy w dwóch warstwach. Najpierw biznes versus IT, potem cele wewnątrz biznesu.
   </p>
 
-  <div class="capacity-list" aria-label="Podział pojemności sprintu na cele">
-    <div class="cap-row">
-      <div class="cap-fill" style="width: 40%;"></div>
-      <div class="cap-content">
-        <div class="cap-head">
-          <div class="cap-name">Więcej pieniędzy</div>
-          <div class="cap-num">40%</div>
-        </div>
-        <div class="cap-desc">Zadania, które bezpośrednio podnoszą obrót lub marżę: konwersja, średnia wartość koszyka, retencja, monetyzacja.</div>
-      </div>
+  <div class="cap-bar-caption">Warstwa 1 - cały sprint</div>
+  <div class="cap-bar" aria-label="Biznes 80%, IT 20%">
+    <div class="cap-seg cap-biznes" style="width: 80%;">
+      <span class="cap-seg-name">Biznes</span>
+      <span class="cap-seg-pct">80%</span>
     </div>
-
-    <div class="cap-row">
-      <div class="cap-fill" style="width: 20%;"></div>
-      <div class="cap-content">
-        <div class="cap-head">
-          <div class="cap-name">Praca wewnętrzna IT</div>
-          <div class="cap-num">20%</div>
-        </div>
-        <div class="cap-desc">Rozwój zespołu, narzędzia developerskie, CI/CD, eksperymenty wewnętrzne, automatyzacje pracy programistów.</div>
-      </div>
-    </div>
-
-    <div class="cap-row">
-      <div class="cap-fill" style="width: 20%;"></div>
-      <div class="cap-content">
-        <div class="cap-head">
-          <div class="cap-name">Dług technologiczny + zadania supportowe</div>
-          <div class="cap-num">20%</div>
-        </div>
-        <div class="cap-desc">Refaktor, upgrade frameworków, usuwanie blockerów dla dewelopmentu, plus zgłoszenia od biznesu (drobne poprawki, błędy operacyjne, usprawnienia z BOK i salonów). W tej puli rządzi własny ranking, niezależny od scoringu produktowego.</div>
-      </div>
-    </div>
-
-    <div class="cap-row">
-      <div class="cap-fill" style="width: 10%;"></div>
-      <div class="cap-content">
-        <div class="cap-head">
-          <div class="cap-name">Udział w rynku i CX</div>
-          <div class="cap-num">10%</div>
-        </div>
-        <div class="cap-desc">Pozyskiwanie nowych klientów, doświadczenie zakupowe, lojalność, NPS, nowe segmenty.</div>
-      </div>
-    </div>
-
-    <div class="cap-row">
-      <div class="cap-fill" style="width: 10%;"></div>
-      <div class="cap-content">
-        <div class="cap-head">
-          <div class="cap-name">Niższe koszty</div>
-          <div class="cap-num">10%</div>
-        </div>
-        <div class="cap-desc">Optymalizacje operacyjne: redukcja zwrotów, automatyzacje, mniej godzin ręcznej pracy w BOK i salonach, niższe koszty obsługi zamówienia.</div>
-      </div>
+    <div class="cap-seg cap-it" style="width: 20%;">
+      <span class="cap-seg-name">Praca wewnętrzna IT</span>
+      <span class="cap-seg-pct">20%</span>
     </div>
   </div>
 
-  <p>
-    Każde zadanie ma w Asanie pole <code>🎯 Cel</code>, które jednoznacznie wskazuje, do której kategorii należy. Zadanie bez tego pola nie wchodzi do sprintu - wraca na backlog do uzupełnienia. Score decyduje o kolejności <em>wewnątrz</em> kategorii: w grupie „Więcej pieniędzy" wybieramy najpierw zadania o najwyższym score, potem niższe, aż wypełnimy 40% pojemności sprintu. Tak samo w pozostałych kategoriach.
+  <div class="cap-bar-caption">Warstwa 2 - wewnątrz tych 80% biznesu</div>
+  <div class="cap-bar" aria-label="Więcej pieniędzy 40%, CX 30%, Niższe koszty 20%, Błędy 10%">
+    <div class="cap-seg cap-money" style="width: 40%;">
+      <span class="cap-seg-name">Więcej pieniędzy</span>
+      <span class="cap-seg-pct">40%</span>
+    </div>
+    <div class="cap-seg cap-customers" style="width: 30%;">
+      <span class="cap-seg-name">CX</span>
+      <span class="cap-seg-pct">30%</span>
+    </div>
+    <div class="cap-seg cap-efficiency" style="width: 20%;">
+      <span class="cap-seg-name">Niższe koszty</span>
+      <span class="cap-seg-pct">20%</span>
+    </div>
+    <div class="cap-seg cap-bugs" style="width: 10%;">
+      <span class="cap-seg-name">Błędy</span>
+      <span class="cap-seg-pct">10%</span>
+    </div>
+  </div>
+
+  <div class="cap-legend">
+    <div class="cap-legend-item">
+      <span class="cap-dot cap-money"></span>
+      <span><strong>Więcej pieniędzy (40%)</strong> - ubezpieczenia, SalesManago, wyszukiwarka.</span>
+    </div>
+    <div class="cap-legend-item">
+      <span class="cap-dot cap-customers"></span>
+      <span><strong>CX (30%)</strong> - import opinii, FAQ porównanie, paczkomat dla używanych, opinie o produktach, opinie z CameraNu z tłumaczeniem.</span>
+    </div>
+    <div class="cap-legend-item">
+      <span class="cap-dot cap-efficiency"></span>
+      <span><strong>Niższe koszty (20%)</strong> - promocje eventowe, automatyzacje pracy w BOK, salonach, marketingu, dziale zakupów.</span>
+    </div>
+    <div class="cap-legend-item">
+      <span class="cap-dot cap-bugs"></span>
+      <span><strong>Błędy (10%)</strong> - drobne wpadki w sklepie niepasujące do innych kategorii.</span>
+    </div>
+    <div class="cap-legend-item">
+      <span class="cap-dot cap-it"></span>
+      <span><strong>Praca wewnętrzna IT (20%)</strong> - rozwój zespołu, narzędzia developerskie, CI/CD, eksperymenty wewnętrzne. Pula zarządzana przez tech leada.</span>
+    </div>
+  </div>
+
+  <p class="cap-cel-note">
+    Każde zadanie ma w Asanie pole <code>🎯 Cel</code>, które kieruje je do jednej z pięciu pul. Score decyduje o kolejności <em>wewnątrz</em> kategorii.
   </p>
 
   <h2>Jak czytać wynik</h2>
